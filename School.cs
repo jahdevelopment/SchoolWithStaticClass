@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -100,7 +101,7 @@ namespace SchoolWithStaticClass
             _enrolmentIdCounter++;
 
             course.AddEnrolment(newEnrolment);
-            student.CurrentEnrolment = newEnrolment;
+            student.CurrentEnrolments.Add(newEnrolment);
 
             HashSet<Enrolment> secondCopy = course.GetEnrolments();
 
@@ -108,7 +109,7 @@ namespace SchoolWithStaticClass
             {
                 throw new Exception("Failed to add enrolment to course list.");
             }
-            else if (student.CurrentEnrolment != newEnrolment)
+            else if (!student.CurrentEnrolments.Contains(newEnrolment))
             {
                 throw new Exception("Failed to set student's current enrolment");
             }
@@ -118,6 +119,38 @@ namespace SchoolWithStaticClass
             }
 
             Enrolments.Add(newEnrolment);
+        }
+        public static void DeregisterStudent(int studentId, int courseId)
+        {
+            Student student = GetStudent(studentId);
+
+            if (student == null)
+            {
+                throw new ArgumentException("Error searching student");
+            }
+
+            // find the course that the student is enrolled in to drop
+
+            Enrolment deregisteringEnrolment = null;
+
+            foreach (Enrolment e in student.CurrentEnrolments)
+            {
+                if (e.Course.CourseId == courseId)
+                {
+                    deregisteringEnrolment = e;
+                    break;
+                }
+            }
+
+            if (deregisteringEnrolment == null)
+            {
+                throw new Exception("Student not registered in specified course.");
+            }
+
+            Course deregisteringCourse = deregisteringEnrolment.Course;
+
+            deregisteringCourse.RemoveEnrolment(deregisteringEnrolment);
+            student.CurrentEnrolments.Remove(deregisteringEnrolment);
         }
     }
 }

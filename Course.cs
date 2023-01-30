@@ -67,6 +67,11 @@ namespace SchoolWithStaticClass
             return setCopy;
         }
 
+        public void RemoveEnrolment(Enrolment enrolment)
+        {
+            _enrolments.Remove(enrolment);
+        }
+
 
         public Course(int courseId, string title, int capacity)
         {
